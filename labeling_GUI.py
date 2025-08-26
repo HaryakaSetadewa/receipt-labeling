@@ -5,6 +5,7 @@ from natsort import natsorted
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk, ExifTags
 
+#ardy
 class ReceiptLabeler:
     def __init__(self, root, image_folder, output_folder):
         self.root = root
