@@ -15,7 +15,6 @@ class ReceiptLabeler:
         self.images = natsorted([f for f in os.listdir(image_folder) if f.lower().endswith(".jpg")])
         self.index = 0
         self.items = []
-
         # Listbox gambar
         self.listbox = tk.Listbox(root, width=40, height=25)
         self.listbox.grid(row=0, column=0, rowspan=20, padx=10, pady=10, sticky="ns")
@@ -47,22 +46,22 @@ class ReceiptLabeler:
         self.item_price_entry.bind("<KeyRelease>", lambda e: self.format_number_entry(self.item_price_entry))
 
         self.add_item_btn = tk.Button(root, text="Tambah Item", command=self.add_item)
-        self.add_item_btn.grid(row=3, column=4, padx=5)
+        self.add_item_btn.grid(row=4, column=2, padx=5)
 
         self.del_item_btn = tk.Button(root, text="Hapus Item", command=self.delete_item)
-        self.del_item_btn.grid(row=3, column=5, padx=5)
+        self.del_item_btn.grid(row=4, column=3, padx=5)
 
         self.update_item_btn = tk.Button(root, text="Update Item", command=self.update_item)
-        self.update_item_btn.grid(row=3, column=6, padx=5)
+        self.update_item_btn.grid(row=4, column=4, padx=5)
 
         self.items_box = tk.Listbox(root, width=40, height=6)
-        self.items_box.grid(row=4, column=2, columnspan=3, pady=5)
+        self.items_box.grid(row=5, column=2, columnspan=3, pady=5)
         self.items_box.bind("<<ListboxSelect>>", self.load_selected_item) 
 
         # Charges fields
         self.charge_fields = {}
         charge_labels = ["service", "tax", "discount", "rounding", "tips", "delivery_fee", "other_fees"]
-        for i, field in enumerate(charge_labels, start=5):
+        for i, field in enumerate(charge_labels, start=6):
             tk.Label(root, text=f"{field.capitalize()}:").grid(row=i, column=2, sticky="w")
             entry = tk.Entry(root, width=30)
             entry.grid(row=i, column=3, padx=5, pady=2)
@@ -112,7 +111,6 @@ class ReceiptLabeler:
         except ValueError:
             pass
 
-
     @staticmethod
     def fix_orientation(img_path):
         img = Image.open(img_path)
@@ -140,9 +138,19 @@ class ReceiptLabeler:
 
         img_path = os.path.join(self.image_folder, self.images[self.index])
         img = self.fix_orientation(img_path)
-        img.thumbnail((500, 500))
+                # Ambil ukuran layar
+        screen_w = self.root.winfo_screenwidth()
+        screen_h = self.root.winfo_screenheight()
+
+        # Batas maksimum gambar (setengah layar biar ada ruang untuk form)
+        max_w = int(screen_w * 0.4)
+        max_h = int(screen_h * 0.6)
+
+        img.thumbnail((max_w, max_h), Image.Resampling.LANCZOS)
         self.tk_img = ImageTk.PhotoImage(img)
+
         self.img_label.config(image=self.tk_img)
+        self.img_label.image = self.tk_img  # simpan referensi
 
         self.root.title(f"Labeling Receipt - {self.images[self.index]}")
 
